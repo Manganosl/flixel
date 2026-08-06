@@ -80,9 +80,10 @@ class FlxTimer implements IFlxDestroyable
 	public var finished:Bool = false;
 
 	/**
-	 * Called when timer completes. The function header should be `(timer:FlxTimer)`
+	 * Function that gets called when timer completes.
+	 * Callback should be formed "onTimer(Timer:FlxTimer);"
 	 */
-	public var onComplete:(FlxTimer)->Void;
+	public var onComplete:FlxTimer->Void;
 
 	/**
 	 * Read-only: check how much time is left on the timer.
@@ -140,14 +141,14 @@ class FlxTimer implements IFlxDestroyable
 	/**
 	 * Starts the timer and adds the timer to the timer manager.
 	 *
-	 * @param   time        The duration of the timer, in seconds. If `0` then `onComplete`
-	 *                      fires on the next game update, and the `loops` argument is ignored.
+	 * @param   time        How many seconds it takes for the timer to go off.
+	 *                      If 0 then timer will fire OnComplete callback only once at the first call of update method (which means that Loops argument will be ignored).
 	 * @param   onComplete  Optional, triggered whenever the time runs out, once for each loop.
-	 *                      The function header should be `(timer:FlxTimer)`
+	 *                      Callback should be formed "onTimer(Timer:FlxTimer);"
 	 * @param   loops       How many times the timer should go off. 0 means "looping forever".
 	 * @return  A reference to itself (handy for chaining or whatever).
 	 */
-	public function start(time:Float = 1, ?onComplete:(FlxTimer)->Void, loops:Int = 1):FlxTimer
+	public function start(time:Float = 1, ?onComplete:FlxTimer->Void, loops:Int = 1):FlxTimer
 	{
 		if (manager != null && !_inManager)
 		{

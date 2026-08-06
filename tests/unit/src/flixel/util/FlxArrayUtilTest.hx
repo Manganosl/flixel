@@ -102,47 +102,4 @@ class FlxArrayUtilTest
 		Assert.isTrue([0, 1, 2, 3, 4, 5].safeSwap(0, 2).equals([2, 1, 0, 3, 4, 5]));
 		Assert.isTrue([0, 1, 2, 3, 4, 5].safeSwap(1, 6).equals([0, 1, 2, 3, 4, 5]));
 	}
-
-	@Test
-	function testScale()
-	{
-		Assert.isTrue([0, 1, 2, 3, 4, 5].scale(2).equals([0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5]));
-	}
-
-	@Test
-	function testScale2d()
-	{
-		final actual = [[0, 1, 2], [3, 4, 5]].scale(2);
-		Assert.isTrue(actual[0].equals([0, 0, 1, 1, 2, 2]));
-		Assert.isTrue(actual[1].equals([0, 0, 1, 1, 2, 2]));
-		Assert.isTrue(actual[2].equals([3, 3, 4, 4, 5, 5]));
-		Assert.isTrue(actual[3].equals([3, 3, 4, 4, 5, 5]));
-		
-		final actual = [[0, 1, 2], [3, 4, 5]].scale(2, 3);
-		Assert.isTrue(actual[0].equals([0, 0, 1, 1, 2, 2]));
-		Assert.isTrue(actual[1].equals([0, 0, 1, 1, 2, 2]));
-		Assert.isTrue(actual[2].equals([0, 0, 1, 1, 2, 2]));
-		Assert.isTrue(actual[3].equals([3, 3, 4, 4, 5, 5]));
-		Assert.isTrue(actual[4].equals([3, 3, 4, 4, 5, 5]));
-		Assert.isTrue(actual[5].equals([3, 3, 4, 4, 5, 5]));
-	}
-
-	@Test
-	@:haxe.warning("-WDeprecated")
-	function testSetLength()
-	{
-		final arr = [0, 1, 2, 3, 4, 5];
-		
-		// ignores negative numbers
-		arr.setLength(-1);
-		FlxAssert.arraysEqual([0, 1, 2, 3, 4, 5], arr);
-		
-		// expected usage
-		arr.setLength(3);
-		FlxAssert.arraysEqual([0, 1, 2], arr);
-		
-		// can't make arrays bigger
-		arr.setLength(5);
-		FlxAssert.arraysEqual([0, 1, 2], arr);
-	}
 }

@@ -1,7 +1,6 @@
 package flixel;
 
-import flixel.group.FlxContainer;
-import flixel.util.FlxDestroyUtil;
+import flixel.util.FlxDestroyUtil.IFlxDestroyable;
 import flixel.util.FlxStringUtil;
 
 /**
@@ -53,14 +52,14 @@ class FlxBasic implements IFlxDestroyable
 	/**
 	 * Gets or sets the first camera of this object.
 	 */
-	public var camera(get, set):FlxCamera;
+	@:isVar public var camera(get, set):FlxCamera;
 
 	/**
 	 * This determines on which `FlxCamera`s this object will be drawn. If it is `null` / has not been
 	 * set, it uses the list of default draw targets, which is controlled via `FlxG.camera.setDefaultDrawTarget`
 	 * as well as the `DefaultDrawTarget` argument of `FlxG.camera.add`.
 	 */
-	public var cameras(get, set):Array<FlxCamera>;
+	@:isVar public var cameras(get, set):Array<FlxCamera>;
 
 	/**
 	 * Enum that informs the collision system which type of object this is (to avoid expensive type casting).
@@ -70,12 +69,11 @@ class FlxBasic implements IFlxDestroyable
 
 	@:noCompletion
 	var _cameras:Array<FlxCamera>;
-	
+
 	/**
-	 * The parent containing this basic, typically if you check this recursively you should reach the state
-	 * @since 5.7.0
+	 * Handler for more data
 	 */
-	public var container(get, null):Null<FlxContainer>;
+	public var extraData:Map<String, Dynamic> = new Map<String, Dynamic>();
 
 	public function new() {}
 
@@ -91,10 +89,6 @@ class FlxBasic implements IFlxDestroyable
 	 */
 	public function destroy():Void
 	{
-		if (container != null)
-			container.remove(this);
-		
-		container = null;
 		exists = false;
 		_cameras = null;
 	}
@@ -192,66 +186,17 @@ class FlxBasic implements IFlxDestroyable
 			_cameras[0] = Value;
 		return Value;
 	}
-	
-	/**
-	 * The main camera that will draw this. Use `this.cameras` to set specific cameras for this
-	 * object, otherwise the container's camera is used, or the container's container and so on.
-	 * If there is no container, say, if this is inside `FlxGroups` rather than a `FlxContainer`
-	 * then `FlxG.camera` is returned.
-	 * @since 5.7.0
-	 */
-	public function getDefaultCamera():FlxCamera
-	{
-		final cameras = getCameras();
-		// should never be null, unless people do something stupid, but just in case
-		return cameras == null || cameras.length == 0 ? FlxG.camera : cameras[0];
-	}
-	
-	/**
-	 * The cameras that will draw this. Use `this.cameras` to set specific cameras for this object,
-	 * otherwise the container's cameras are used, or the container's container and so on. If there
-	 * is no container, say, if this is inside `FlxGroups` rather than a `FlxContainer` then the
-	 * default draw cameras are returned.
-	 * @since 5.7.0
-	 */
-	public function getCameras():Array<FlxCamera>
-	{
-		return if (_cameras != null)
-				_cameras;
-			else if (_cameras == null && container != null)
-				container.getCameras();
-			else
-				@:privateAccess FlxCamera._defaultCameras;
-	}
-	
-	/**
-	 * Helper while moving away from `get_cameras`. Should only be used in the draw phase
-	 */
-	@:noCompletion
-	function getCamerasLegacy()
-	{
-		@:privateAccess
-		return (_cameras == null) ? FlxCamera._defaultCameras : _cameras;
-	}
-	
+
 	@:noCompletion
 	function get_cameras():Array<FlxCamera>
 	{
-		return getCamerasLegacy();
+		return (_cameras == null) ? FlxCamera._defaultCameras : _cameras;
 	}
 
 	@:noCompletion
 	function set_cameras(Value:Array<FlxCamera>):Array<FlxCamera>
 	{
 		return _cameras = Value;
-	}
-	
-	// Only needed for FlxSpriteContainer.SpriteContainer
-	// TODO: remove this when FlxSpriteContainer is removed
-	@:noCompletion
-	function get_container()
-	{
-		return this.container;
 	}
 }
 
@@ -267,7 +212,6 @@ enum abstract FlxType(Int)
 	var SPRITEGROUP = 4;
 }
 
-@:deprecated("IFlxBasic is deprecated and never used")
 interface IFlxBasic
 {
 	var ID:Int;

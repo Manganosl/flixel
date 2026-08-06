@@ -4,7 +4,6 @@ package flixel.input.keyboard;
 import flixel.FlxG;
 import flixel.input.FlxInput;
 import flixel.system.replay.CodeValuePair;
-import flixel.text.FlxInputText;
 import openfl.events.KeyboardEvent;
 
 /**
@@ -102,7 +101,7 @@ class FlxKeyboard extends FlxKeyManager<FlxKey, FlxKeyList>
 
 		// Debugger toggle
 		#if FLX_DEBUG
-		if (FlxG.game.debugger != null && inKeyArray(FlxG.debugger.toggleKeys, event) && enabled && !FlxInputText.globalManager.isTyping)
+		if (FlxG.game.debugger != null && inKeyArray(FlxG.debugger.toggleKeys, event))
 		{
 			FlxG.debugger.visible = !FlxG.debugger.visible;
 		}
@@ -115,10 +114,7 @@ class FlxKeyboard extends FlxKeyManager<FlxKey, FlxKeyList>
 
 		// Attempted to cancel the replay?
 		#if FLX_RECORD
-		if (FlxG.game.replaying
-			&& !inKeyArray(FlxG.debugger.toggleKeys, event)
-			&& inKeyArray(FlxG.vcr.cancelKeys, event)
-			&& !FlxInputText.globalManager.isTyping)
+		if (FlxG.game.replaying && !inKeyArray(FlxG.debugger.toggleKeys, event) && inKeyArray(FlxG.vcr.cancelKeys, event))
 		{
 			FlxG.vcr.cancelReplay();
 		}

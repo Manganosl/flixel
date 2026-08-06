@@ -1,17 +1,17 @@
 package flixel.input.gamepad;
 
 import flixel.input.FlxInput.FlxInputState;
+import flixel.util.FlxSignal.FlxTypedSignal;
 import flixel.input.gamepad.FlxGamepad.FlxGamepadModel;
 import flixel.util.FlxDestroyUtil;
-import flixel.util.FlxSignal.FlxTypedSignal;
 #if FLX_JOYSTICK_API
 import flixel.FlxG;
 import flixel.math.FlxPoint;
 import openfl.events.JoystickEvent;
 #elseif FLX_GAMEINPUT_API
-import openfl.events.GameInputEvent;
 import openfl.ui.GameInput;
 import openfl.ui.GameInputDevice;
+import openfl.events.GameInputEvent;
 
 using flixel.util.FlxStringUtil;
 #end
@@ -50,13 +50,7 @@ class FlxGamepadManager implements IFlxInputManager
 	 * @since 4.6.0
 	 */
 	public var deviceDisconnected(default, null):FlxTypedSignal<FlxGamepad->Void>;
-	
-	/**
-	 * Whether the bottom or right face button is ACCEPT
-	 * @since 5.9.0
-	 */
-	public var acceptMode:FlxGamepadAcceptMode = BOTTOM;
-	
+
 	/**
 	 * Stores all gamepads - can have null entries, but index matches event.device
 	 */
@@ -409,9 +403,7 @@ class FlxGamepadManager implements IFlxInputManager
 		name = name.toLowerCase().remove("-").remove("_");
 		return if (name.contains("ouya"))
 				OUYA; // "OUYA Game Controller"
-			else if (name.contains("ps5") || name.contains('dualsense'))
-				PS5;
-			else if (name.contains("wireless controller") || name.contains("ps4") || name.contains("dualshock 4"))
+			else if (name.contains("wireless controller") || name.contains("ps4"))
 				PS4; // "Wireless Controller" or "PS4 controller"
 			else if (name.contains("logitech"))
 				LOGITECH;
@@ -602,28 +594,4 @@ class FlxGamepadManager implements IFlxInputManager
 				count++;
 		return count;
 	}
-}
-
-/**
- * @since 5.9.0
- */
-enum FlxGamepadAcceptMode
-{
-	/**
-	 * The bottom face button is `ACCEPT` and the right face button is `CANCEL`.
-	 * This is common on western-style consoles, like XBox or American PS4/5
-	 */
-	BOTTOM;
-	
-	/**
-	 * The right face button is `ACCEPT` and the bottom face button is `CANCEL`.
-	 * This is common in Japanese PS4/5 consoles, and Nintendo consoles
-	 */
-	RIGHT;
-	
-	/**
-	 * Behaves like `BOTTOM` for nearly all gamepads, but `RIGHT` for specific mappings,
-	 * namely Nintendo Switch gamepads
-	 */
-	USE_MAPPING;
 }

@@ -25,25 +25,6 @@ class BMFontTest extends FlxTest
 	}
 	
 	@Test
-	function testTextFormatWithSpaces()
-	{
-		var text =
-		'info face="Arial Black" size=32 bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=1 aa=1 padding=1,2,3,4 spacing=2,1 outline=0'
-		+ '\ncommon lineHeight=32 base=25 scaleW=256 scaleH=256 pages=1 packed=0 alphaChnl=1 redChnl=0 greenChnl=0 blueChnl=0'
-		+ '\npage id=0 file="arial_black_0.png"'
-		+ '\nchars count=3'
-		+ '\nchar id=64   x=0     y=0     width=25    height=24    xoffset=-5    yoffset=7     xadvance=17    page=0   chnl=15'
-		+ '\nchar id= 65  x= 27   y= 0    width= 26   height= 21   xoffset= -5   yoffset= 7    xadvance= 18   page= 0  chnl= 15'
-		+ '\nchar id=  84 x=  55  y=  0   width=  23  height=  21  xoffset=  -4  yoffset=  7   xadvance=  16  page=  0 chnl=  15'
-		+ '\nkernings count=2'
-		+ '\nkerning first=84  second=65  amount=-2  '
-		+ '\nkerning first= 65 second= 84 amount= -2 ';
-		
-		var font = BMFont.parse(cast text);
-		assertFont(font);
-	}
-	
-	@Test
 	function testXMLFormat()
 	{
 		var xml = '<?xml version="1.0"?>
@@ -83,7 +64,7 @@ class BMFontTest extends FlxTest
 	}
 	
 	// This assumes the incoming font has a specific configuration we are checking for
-	function assertFont(font:BMFont)
+	private function assertFont(font:BMFont)
 	{
 		// INFO
 		Assert.areEqual("Arial Black", font.info.face);
@@ -142,11 +123,11 @@ class BMFontTest extends FlxTest
 		
 		for (i in 0...expectedKerns.length)
 		{
-			assertKerningMatches(expectedKerns[i], font.kernings[i]);
+			assertKerningMatches(expectedKerns[i], font.kerning[i]);
 		}
 	}
 	
-	function assertCharMatches(expected:BMFontChar, actual:BMFontChar)
+	private function assertCharMatches(expected:BMFontChar, actual:BMFontChar)
 	{
 		Assert.areEqual(expected.id, actual.id);
 		Assert.areEqual(expected.x, actual.x);
@@ -162,7 +143,7 @@ class BMFontTest extends FlxTest
 		// 	Assert.areEqual(expected.letter, actual.letter);
 	}
 	
-	function assertKerningMatches(expected:BMFontKerning, actual:BMFontKerning)
+	private function assertKerningMatches(expected:BMFontKerning, actual:BMFontKerning)
 	{
 		Assert.areEqual(expected.first, actual.first);
 		Assert.areEqual(expected.second, actual.second);
