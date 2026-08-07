@@ -314,8 +314,8 @@ class FlxGame extends Sprite
 	 */
 	public function addShader(shader:FlxGraphicsShader):Bool {
 		try {
-			if (this.filters == null) this.filters = [];
-			this.filters.push(new ShaderFilter(shader));
+			if (this._filters == null) this._filters = [];
+			this._filters.push(new ShaderFilter(shader));
 		} catch(_) {};
 		return false;
 	}
@@ -326,12 +326,12 @@ class FlxGame extends Sprite
 	 * @return Whenever the shader has been successfully removed or not.
 	 */
 	public function removeShader(shader:FlxGraphicsShader):Bool {
-		if (filters == null) filters = [];
-		for (f in filters) {
+		if (filters == null) _filters = [];
+		for (f in _filters) {
 			if (f is ShaderFilter) {
 				var sf = cast(f, ShaderFilter);
 				if (sf.shader == shader) {
-					filters.remove(f);
+					_filters.remove(f);
 					return true;
 				}
 			}
