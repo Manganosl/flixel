@@ -11,6 +11,8 @@ import openfl.display.StageAlign;
 import openfl.display.StageScaleMode;
 import openfl.events.Event;
 import openfl.filters.BitmapFilter;
+import openfl.filters.ShaderFilter;
+import flixel.graphics.tile.FlxGraphicsShader;
 #if desktop
 import openfl.events.FocusEvent;
 #end
@@ -303,6 +305,40 @@ class FlxGame extends Sprite
 	{
 		_filters = filters;
 	}
+
+
+	/**
+	 * Adds a FlxShader as a filter to the camera
+	 * @param shader Shader to add
+	 * @return ShaderFilter
+	 */
+	public function addShader(shader:FlxGraphicsShader):Bool {
+		try {
+			if (this.filters == null) this.filters = [];
+			this.filters.push(new ShaderFilter(shader));
+		} catch(_) {};
+		return false;
+	}
+
+	/**
+	 * Removes a FlxShader's ShaderFilter from the camera.
+	 * @param shader Shader to remove
+	 * @return Whenever the shader has been successfully removed or not.
+	 */
+	public function removeShader(shader:FlxGraphicsShader):Bool {
+		if (filters == null) filters = [];
+		for (f in filters) {
+			if (f is ShaderFilter) {
+				var sf = cast(f, ShaderFilter);
+				if (sf.shader == shader) {
+					filters.remove(f);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 
 	/**
 	 * Used to instantiate the guts of the flixel game object once we have a valid reference to the root.
