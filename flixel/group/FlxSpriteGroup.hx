@@ -797,6 +797,13 @@ class FlxTypedSpriteGroup<T:FlxSprite> extends FlxSprite
 		return blend = Value;
 	}
 
+	override function set_zoomFactor(Value:Float):Float
+	{
+		if (exists && zoomFactor != Value)
+			transformChildren(zoomFactorTransform, Value);
+		return zoomFactor = Value;
+	}
+
 	override function set_clipRect(rect:FlxRect):FlxRect
 	{
 		if (exists)
@@ -1031,6 +1038,9 @@ class FlxTypedSpriteGroup<T:FlxSprite> extends FlxSprite
 
 	inline function blendTransform(Sprite:FlxSprite, Blend:BlendMode)
 		Sprite.blend = Blend;
+
+	inline function zoomFactorTransform(Sprite:FlxSprite, ZoomFactor:Float)
+		Sprite.zoomFactor = ZoomFactor;
 
 	inline function immovableTransform(Sprite:FlxSprite, Immovable:Bool)
 		Sprite.immovable = Immovable;
