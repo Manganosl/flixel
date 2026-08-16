@@ -633,12 +633,6 @@ class FlxObject extends FlxBasic
 	public var scrollFactor(default, null):FlxPoint;
 
 	/**
-	 * Controls how much this object is affected by camera zooms. `0` = no movement,
-	 * `1` = same zoom as the foreground. Default value is `1`
-	 */
-	public var zoomFactor:Float = 1;
-
-	/**
 	 * The basic speed of this object (in pixels per second).
 	 */
 	public var velocity(default, null):FlxPoint;

@@ -253,6 +253,12 @@ class FlxSprite extends FlxObject
 	public var scale(default, null):FlxPoint;
 
 	/**
+	 * Controls how much this object is affected by camera zooms. `0` = no movement,
+	 * `1` = same zoom as the foreground. Default value is `1`
+	 */
+	public var zoomFactor(default, set):Float = 1;
+
+	/**
 	 * Blending modes, just like Photoshop or whatever, e.g. "multiply", "screen", etc.
 	 */
 	public var blend(default, set):BlendMode;
@@ -1549,6 +1555,12 @@ class FlxSprite extends FlxObject
 			_cosAngle = Math.cos(radians);
 			_angleChanged = false;
 		}
+	}
+
+	@:noCompletion
+	function set_zoomFactor(Value:Float):Float
+	{
+		return zoomFactor = Value;
 	}
 
 	@:noCompletion
