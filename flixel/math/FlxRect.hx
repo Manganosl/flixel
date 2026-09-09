@@ -452,6 +452,20 @@ class FlxRect implements IFlxPooled
 	}
 
 	/**
+	 * The middle point of this rect
+	 * 
+	 * @param   point  The point to hold the result, if `null` a new one is created
+	 * @since 5.9.0
+	 */
+	public function getMidpoint(?point:FlxPoint)
+	{
+		if (point == null)
+			point = FlxPoint.get();
+		
+		return point.set(x + 0.5 * width, y + 0.5 * height);
+	}
+
+	/**
 	 * Convert object to readable string name. Useful for debugging, save games, etc.
 	 */
 	public inline function toString():String
