@@ -55,6 +55,21 @@ class FlxDestroyUtil
 	}
 
 	/**
+	 * Checks if an object is not null before calling `putWeak`, always returns `null`
+	 *
+	 * @param   object  An `IFlxPooled` object that will be put back into the pool if it's not `null`
+	 * @return  `null`
+	 * @since 6.2.0
+	 */
+	public static function putWeak<T:IFlxPooled>(object:IFlxPooled):T
+	{
+		if (object != null)
+			object.putWeak();
+		
+		return null;
+	}
+
+	/**
 	 * Puts all objects in an Array of IFlxPooled objects back into
 	 * the pool by calling FlxDestroyUtil.put() on them
 	 *
