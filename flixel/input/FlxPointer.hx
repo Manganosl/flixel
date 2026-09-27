@@ -14,10 +14,10 @@ class FlxPointer
 	
 	/** The world position relative to the main camera's scroll position */
 	@:deprecated("screenX is deprecated, use viewX, instead")
-	public var screenX(default, never):Int = 0;
+	public var screenX(get, null):Int = 0;
 	/** The world position relative to the main camera's scroll position */
 	@:deprecated("screenY is deprecated, use viewY, instead")
-	public var screenY(default, never):Int = 0;
+	public var screenY(get, null):Int = 0;
 	
 	/**
 	 * The world position relative to the main camera's scroll position, `cam.viewMarginX` or
@@ -249,6 +249,16 @@ class FlxPointer
 	public function toString():String
 	{
 		return FlxStringUtil.getDebugString([LabelValuePair.weak("x", x), LabelValuePair.weak("y", y)]);
+	}
+
+	inline function get_screenX():Int
+	{
+		return viewX;
+	}
+
+	inline function get_screenY():Int
+	{
+		return viewY;
 	}
 	
 	inline function get__globalScreenX():Int
