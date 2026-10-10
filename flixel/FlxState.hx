@@ -10,11 +10,10 @@ import flixel.util.typeLimit.NextState;
  * This is the basic game "state" object - e.g. in a simple game you might have a menu state and a play state.
  * It is for all intents and purpose a fancy `FlxContainer`. And really, it's not even that fancy.
  */
-@:keepSub // workaround for HaxeFoundation/haxe#3749
+@:keepSub
 #if FLX_NO_UNIT_TEST
 @:autoBuild(flixel.system.macros.FlxMacroUtil.deprecateOverride("switchTo", "switchTo is deprecated, use startOutro"))
 #end
-// show deprecation warning when `switchTo` is overriden in dereived classes
 class FlxState extends FlxContainer
 {
 	/**
@@ -60,6 +59,11 @@ class FlxState extends FlxContainer
 	public var subState(default, null):FlxSubState;
 
 	/**
+	 * Current top substate. It behaves like `subState`, but it is updated and drawn above it.
+	 */
+	public var topSubState(default, null):FlxSubState;
+
+	/**
 	 * If a state change was requested, the new state object is stored here until we switch to it.
 	 */
 	@:noCompletion
@@ -70,6 +74,12 @@ class FlxState extends FlxContainer
 	 */
 	@:noCompletion
 	var _requestSubStateReset:Bool = false;
+
+	@:noCompletion
+	var _requestedTopSubState:FlxSubState;
+
+	@:noCompletion
+	var _requestTopSubStateReset:Bool = false;
 
 	/**
 	 * A `FlxSignal` that dispatches when a sub state is opened from this state.
@@ -84,6 +94,16 @@ class FlxState extends FlxContainer
 	public var subStateClosed(get, never):FlxTypedSignal<FlxSubState->Void>;
 
 	/**
+	 * A `FlxSignal` that dispatches when a top sub state is opened from this state.
+	 */
+	public var topSubStateOpened(get, never):FlxTypedSignal<FlxSubState->Void>;
+
+	/**
+	 * A `FlxSignal` that dispatches when a top sub state is closed from this state.
+	 */
+	public var topSubStateClosed(get, never):FlxTypedSignal<FlxSubState->Void>;
+
+	/**
 	 * Internal variables for lazily creating `subStateOpened` and `subStateClosed` signals when needed.
 	 */
 	@:noCompletion
@@ -91,6 +111,12 @@ class FlxState extends FlxContainer
 
 	@:noCompletion
 	var _subStateClosed:FlxTypedSignal<FlxSubState->Void>;
+
+	@:noCompletion
+	var _topSubStateOpened:FlxTypedSignal<FlxSubState->Void>;
+
+	@:noCompletion
+	var _topSubStateClosed:FlxTypedSignal<FlxSubState->Void>;
 	
 	public function new ()
 	{
@@ -107,11 +133,14 @@ class FlxState extends FlxContainer
 
 	override public function draw():Void
 	{
-		if (persistentDraw || subState == null)
+		if (persistentDraw || (subState == null && topSubState == null))
 			super.draw();
 
 		if (subState != null)
 			subState.draw();
+
+		if (topSubState != null)
+			topSubState.draw();
 	}
 
 	public function openSubState(SubState:FlxSubState):Void
@@ -128,12 +157,25 @@ class FlxState extends FlxContainer
 		_requestSubStateReset = true;
 	}
 
+	public function openTopSubState(SubState:FlxSubState):Void
+	{
+		_requestTopSubStateReset = true;
+		_requestedTopSubState = SubState;
+	}
+
+	/**
+	 * Closes the top substate of this state, if one exists.
+	 */
+	public function closeTopSubState():Void
+	{
+		_requestTopSubStateReset = true;
+	}
+
 	/**
 	 * Load substate for this state
 	 */
 	public function resetSubState():Void
 	{
-		// Close the old state (if there is an old state)
 		if (subState != null)
 		{
 			if (subState.closeCallback != null)
@@ -145,13 +187,11 @@ class FlxState extends FlxContainer
 				subState.destroy();
 		}
 
-		// Assign the requested state (or set it to null)
 		subState = _requestedSubState;
 		_requestedSubState = null;
 
 		if (subState != null)
 		{
-			// Reset the input so things like "justPressed" won't interfere
 			if (!persistentUpdate)
 				FlxG.inputs.onStateSwitch();
 
@@ -169,6 +209,44 @@ class FlxState extends FlxContainer
 		}
 	}
 
+	/**
+	 * Load top substate for this state
+	 */
+	public function resetTopSubState():Void
+	{
+		if (topSubState != null)
+		{
+			if (topSubState.closeCallback != null)
+				topSubState.closeCallback();
+			if (_topSubStateClosed != null)
+				_topSubStateClosed.dispatch(topSubState);
+
+			if (destroySubStates)
+				topSubState.destroy();
+		}
+
+		topSubState = _requestedTopSubState;
+		_requestedTopSubState = null;
+
+		if (topSubState != null)
+		{
+			if (!persistentUpdate)
+				@:privateAccess FlxG.inputs.onStateSwitch();
+
+			@:privateAccess topSubState._parentState = this;
+
+			if (!@:privateAccess topSubState._created)
+			{
+				@:privateAccess topSubState._created = true;
+				topSubState.create();
+			}
+			if (topSubState.openCallback != null)
+				topSubState.openCallback();
+			if (_topSubStateOpened != null)
+				_topSubStateOpened.dispatch(topSubState);
+		}
+	}
+
 	override function destroy():Void
 	{
 		_constructor = function():FlxState
@@ -177,11 +255,19 @@ class FlxState extends FlxContainer
 		};
 		FlxDestroyUtil.destroy(_subStateOpened);
 		FlxDestroyUtil.destroy(_subStateClosed);
+		FlxDestroyUtil.destroy(_topSubStateOpened);
+		FlxDestroyUtil.destroy(_topSubStateClosed);
 		
 		if (subState != null)
 		{
 			subState.destroy();
 			subState = null;
+		}
+
+		if (topSubState != null)
+		{
+			topSubState.destroy();
+			topSubState = null;
 		}
 		super.destroy();
 	}
@@ -235,7 +321,7 @@ class FlxState extends FlxContainer
 	@:allow(flixel.FlxGame)
 	function tryUpdate(elapsed:Float):Void
 	{
-		if (persistentUpdate || subState == null)
+		if (persistentUpdate || (subState == null && topSubState == null))
 			update(elapsed);
 
 		if (_requestSubStateReset)
@@ -246,6 +332,16 @@ class FlxState extends FlxContainer
 		if (subState != null)
 		{
 			subState.tryUpdate(elapsed);
+		}
+
+		if (_requestTopSubStateReset)
+		{
+			_requestTopSubStateReset = false;
+			resetTopSubState();
+		}
+		if (topSubState != null)
+		{
+			topSubState.tryUpdate(elapsed);
 		}
 	}
 
@@ -277,5 +373,23 @@ class FlxState extends FlxContainer
 			_subStateClosed = new FlxTypedSignal<FlxSubState->Void>();
 
 		return _subStateClosed;
+	}
+
+	@:noCompletion
+	function get_topSubStateOpened():FlxTypedSignal<FlxSubState->Void>
+	{
+		if (_topSubStateOpened == null)
+			_topSubStateOpened = new FlxTypedSignal<FlxSubState->Void>();
+
+		return _topSubStateOpened;
+	}
+
+	@:noCompletion
+	function get_topSubStateClosed():FlxTypedSignal<FlxSubState->Void>
+	{
+		if (_topSubStateClosed == null)
+			_topSubStateClosed = new FlxTypedSignal<FlxSubState->Void>();
+
+		return _topSubStateClosed;
 	}
 }

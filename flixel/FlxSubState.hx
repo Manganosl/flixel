@@ -35,6 +35,7 @@ class FlxSubState extends FlxState
 	 * Helper var for `close()` so `closeSubState()` can be called on the parent.
 	 */
 	@:allow(flixel.FlxState.resetSubState)
+	@:allow(flixel.FlxState.resetTopSubState)
 	var _parentState:FlxState;
 
 	@:noCompletion
@@ -42,6 +43,7 @@ class FlxSubState extends FlxState
 
 	@:noCompletion
 	@:allow(flixel.FlxState.resetSubState)
+	@:allow(flixel.FlxState.resetTopSubState)
 	var _created:Bool = false;
 
 	/**
@@ -91,8 +93,13 @@ class FlxSubState extends FlxState
 	 */
 	public function close():Void
 	{
-		if (_parentState != null && _parentState.subState == this)
+		if (_parentState == null)
+			return;
+
+		if (_parentState.subState == this)
 			_parentState.closeSubState();
+		else if (_parentState.topSubState == this)
+			_parentState.closeTopSubState();
 	}
 
 	@:noCompletion
